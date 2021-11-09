@@ -337,7 +337,7 @@ mongoClient.connect(CONNECTIONSTRING, function (err, client) {
     if (!err) {
         let db = client.db(DBNAME)
         let collection = db.collection("unicorns")
-        collection.updateOne({"name":"Pilot"},{$inc: {vampires: +1}},function(err,data){
+        collection.updateOne({"name":"Pilot"},{$inc: {vampires: +1}},{"upsert":true},function(err,data){
             if (!err) {
                 console.log("Query 16 ", data)
             } else {
@@ -355,7 +355,7 @@ mongoClient.connect(CONNECTIONSTRING, function (err, client) {
     if (!err) {
         let db = client.db(DBNAME)
         let collection = db.collection("unicorns")
-        collection.updateOne({"name":"Aurora"},{$push: {loves: 'carrot'},$inc: {weight: +10}},function(err,data){
+        collection.updateOne({"name":"Aurora"},{$addToSet: {loves: 'carrot'},$inc: {weight: +10}},function(err,data){
             if (!err) {
                 console.log("Query 17 ", data)
             } else {
