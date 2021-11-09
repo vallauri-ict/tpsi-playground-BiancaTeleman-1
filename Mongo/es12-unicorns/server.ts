@@ -318,7 +318,7 @@ mongoClient.connect(CONNECTIONSTRING, function (err, client) {
         collection.deleteOne({"name":"Hornysss"},function(err,data)
         {
             if (!err) {
-                console.log("Rimosso correttamente")
+                //console.log("Rimosso correttamente")
             } 
             else 
             {
@@ -355,7 +355,7 @@ mongoClient.connect(CONNECTIONSTRING, function (err, client) {
     if (!err) {
         let db = client.db(DBNAME)
         let collection = db.collection("unicorns")
-        collection.updateOne({"name":"Aurora"},{$push: {loves: 'carrots'},$inc: {weight: +10}},function(err,data){
+        collection.updateOne({"name":"Aurora"},{$push: {loves: 'carrot'},$inc: {weight: +10}},function(err,data){
             if (!err) {
                 console.log("Query 17 ", data)
             } else {
@@ -381,6 +381,42 @@ mongoClient.connect(CONNECTIONSTRING, function (err, client) {
             client.close();
         })
 
+    } else {
+        console.log("Errore connessione al db")
+    }
+})
+
+//query 20
+mongoClient.connect(CONNECTIONSTRING, function (err, client) {
+    if (!err) {
+        let db = client.db(DBNAME)
+        let collection = db.collection("unicorns")
+        collection.deleteMany({"loves":{$all:["grape","carrot"]}}),function(err,data){
+            if (!err) {
+                console.log("Query 20 ", data)
+            } else {
+                console.log("Errore esecuzione query " + err.message)
+            }
+            client.close();
+        }
+    } else {
+        console.log("Errore connessione al db")
+    }
+})
+
+//query 21
+mongoClient.connect(CONNECTIONSTRING, function (err, client) {
+    if (!err) {
+        let db = client.db(DBNAME)
+        let collection = db.collection("unicorns")
+        collection.find({"gender":"f"}).project({"vampires":1,"name":1}).sort({"vampires": -1}).limit(1),function(err,data){
+            if (!err) {
+                console.log("Query 21", data)
+            } else {
+                console.log("Errore esecuzione query " + err.message)
+            }
+            client.close();
+        }
     } else {
         console.log("Errore connessione al db")
     }
