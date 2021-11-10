@@ -337,7 +337,7 @@ mongoClient.connect(CONNECTIONSTRING, function (err, client) {
     if (!err) {
         let db = client.db(DBNAME)
         let collection = db.collection("unicorns")
-        collection.updateOne({"name":"Pilot"},{$inc: {vampires: +1}},{"upsert":true},function(err,data){
+        collection.updateOne({"name":"Pluto"},{$inc: {vampires: +1}},{"upsert":true},function(err,data){
             if (!err) {
                 console.log("Query 16 ", data)
             } else {
@@ -391,14 +391,14 @@ mongoClient.connect(CONNECTIONSTRING, function (err, client) {
     if (!err) {
         let db = client.db(DBNAME)
         let collection = db.collection("unicorns")
-        collection.deleteMany({"loves":{$all:["grape","carrot"]}}),function(err,data){
+        collection.deleteMany({"loves":{"$all":["grape","carrot"]}},function(err,data){
             if (!err) {
-                console.log("Query 20 ", data)
+                console.log("Query 20 - dati cancellati")
             } else {
                 console.log("Errore esecuzione query " + err.message)
             }
             client.close();
-        }
+        })
     } else {
         console.log("Errore connessione al db")
     }
@@ -409,14 +409,32 @@ mongoClient.connect(CONNECTIONSTRING, function (err, client) {
     if (!err) {
         let db = client.db(DBNAME)
         let collection = db.collection("unicorns")
-        collection.find({"gender":"f"}).project({"vampires":1,"name":1}).sort({"vampires": -1}).limit(1),function(err,data){
+        collection.find({"gender":"f"}).sort({"vampires": -1}).project({"vampires":1,"name":1}).limit(1).toArray(function(err,data){
             if (!err) {
                 console.log("Query 21", data)
             } else {
                 console.log("Errore esecuzione query " + err.message)
             }
             client.close();
-        }
+        })
+    } else {
+        console.log("Errore connessione al db")
+    }
+})
+
+//query 22
+mongoClient.connect(CONNECTIONSTRING, function (err, client) {
+    if (!err) {
+        let db = client.db(DBNAME)
+        let collection = db.collection("unicorns")
+        collection.replaceOne({"name":"Pluto"},{"name":"Pluto","residenza":"Fossano","loves":["apple"]},function(err,data){
+            if (!err) {
+                console.log("Query 22", data)
+            } else {
+                console.log("Errore esecuzione query " + err.message)
+            }
+            client.close();
+        })
     } else {
         console.log("Errore connessione al db")
     }
