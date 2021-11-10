@@ -27,6 +27,30 @@ mongoClient.connect(CONNECTIONSTRING, function (err, client) {
     }
 })
 
+//query 1b
+mongoClient.connect(CONNECTIONSTRING, function (err, client) {
+    if (!err) {
+        let db = client.db(DBNAME)
+        let collection = db.collection("unicorns")
+        let req=collection.find({ "weight": { "$lte": 800, "$gte": 700 } }).toArray();
+        req.then(function(data)
+        {
+            console.log("Query 1b promise", data)
+        })
+        req.catch(function(err)
+        {
+            console.log("Errore esecuzione query " + err.message)
+        })
+        req.finally(function()
+        {
+            client.close();
+        })        
+            
+    }
+     else {
+        console.log("Errore connessione al db")
+    }
+})
 // query 2
 mongoClient.connect(CONNECTIONSTRING, function (err, client) {
     if (!err) {
