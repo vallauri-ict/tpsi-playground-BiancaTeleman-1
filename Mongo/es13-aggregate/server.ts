@@ -72,3 +72,96 @@ mongoClient.connect(CONNECTIONSTRING,(err, client) => {
         console.log("Errore connessione al db")
     }
 })
+
+//query 3
+mongoClient.connect(CONNECTIONSTRING,(err, client) => {
+    if (!err) {
+        let db = client.db(DBNAME)
+        let collection = db.collection("unicorns")
+        let req=collection.aggregate([
+            //l'aggregate lavora a catena
+            {"$match":{"gender":{"$exists":true}}},
+            {"$group":{
+                "_id":"$gender", //id è il campo in cui vado a raggruppare
+                "totale":{"$sum":1}
+            }}  
+            ]).toArray();
+        req.then(function(data)
+        {
+            console.log("Query 3", data)
+        })
+        req.catch(function(err)
+        {
+            console.log("Errore esecuzione query " + err.message)
+        })
+        req.finally(function()
+        {
+            client.close();
+        })        
+            
+    }
+     else {
+        console.log("Errore connessione al db")
+    }
+})
+
+//query 4
+mongoClient.connect(CONNECTIONSTRING,(err, client) => {
+    if (!err) {
+        let db = client.db(DBNAME)
+        let collection = db.collection("unicorns")
+        let req=collection.aggregate([
+            {"$group":{
+                "_id":{"gender":"$gender"},
+                "mediaVampiri":{"$avg":"$vampires"}
+            }}  
+            ]).toArray();
+        req.then(function(data)
+        {
+            console.log("Query 4", data)
+        })
+        req.catch(function(err)
+        {
+            console.log("Errore esecuzione query " + err.message)
+        })
+        req.finally(function()
+        {
+            client.close();
+        })        
+            
+    }
+     else {
+        console.log("Errore connessione al db")
+    }
+})
+
+//query 5
+mongoClient.connect(CONNECTIONSTRING,(err, client) => {
+    if (!err) {
+        let db = client.db(DBNAME)
+        let collection = db.collection("unicorns")
+        let req=collection.aggregate([
+            {"$match":{"gender":{"$exists":true}}},
+            {"$group":{
+                "_id":{"gender":"$gender"},
+                "hair":"$hair"},"nEsemplari":{"$sum":1}},
+                {"$sort":{"nEsemplari":-1,"_id":-1}}
+            ]).toArray();
+        req.then(function(data)
+        {
+            console.log("Query 4", data)
+        })
+        req.catch(function(err)
+        {
+            console.log("Errore esecuzione query " + err.message)
+        })
+        req.finally(function()
+        {
+            client.close();
+        })        
+            
+    }
+     else {
+        console.log("Errore connessione al db")
+    }
+})
