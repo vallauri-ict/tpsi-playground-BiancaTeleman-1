@@ -6,7 +6,7 @@ import HEADERS from "./headers.json"
 import * as _mongodb from "mongodb"
 
 const mongoClient = _mongodb.MongoClient
-const CONNECTIONSTRING = "mongodb://127.0.0.1:27017"
+const CONNECTIONSTRING = "mongodb+srv://Bianca:bianca03@cluster0.sxrct.mongodb.net/5B?retryWrites=true&w=majority"
 const DBNAME = "5B"
 
 // query 1
