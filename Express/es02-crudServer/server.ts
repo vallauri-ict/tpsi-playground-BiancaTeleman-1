@@ -9,11 +9,11 @@ import cors from "cors";
 
 const mongoClient = mongodb.MongoClient;
 const CONNECTION_STRING =
-  "mongodb://admin:admin@cluster0-shard-00-00.zarz7.mongodb.net:27017,cluster0-shard-00-01.zarz7.mongodb.net:27017,cluster0-shard-00-02.zarz7.mongodb.net:27017/test?replicaSet=atlas-bgntwo-shard-0&ssl=true&authSource=admin";
+  "mongodb+srv://Bianca:bianca03@cluster0.sxrct.mongodb.net/5B?retryWrites=true&w=majority";
 const DB_NAME = "recipeBook";
 
 
-let port : number = 1337;
+const port = parseInt(process.env.port) || 1337
 let app = express();
 
 let server = http.createServer(app);
