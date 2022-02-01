@@ -8,12 +8,13 @@ import * as mongodb from "mongodb";
 import cors from "cors";
 
 const mongoClient = mongodb.MongoClient;
-const CONNECTION_STRING =
-  "mongodb+srv://Bianca:bianca03@cluster0.sxrct.mongodb.net/5B?retryWrites=true&w=majority";
+const CONNECTION_STRING=process.env.MONGODB_URI
+/*const CONNECTION_STRING =
+  "mongodb+srv://Bianca:bianca03@cluster0.sxrct.mongodb.net/5B?retryWrites=true&w=majority";*/
 const DB_NAME = "recipeBook";
 
 
-const port = parseInt(process.env.port) || 1337
+const port = parseInt(process.env.PORT) || 1337
 let app = express();
 
 let server = http.createServer(app);
@@ -23,7 +24,9 @@ server.listen(port,function(){
     
     init();
 });
-const whitelist = ["http://localhost:4200", "https://localhost:1337"];
+const whitelist = ["http://localhost:4200", "https://localhost:1337",
+                  "https://bianca-teleman-crud-server.herokuapp.com/",
+                  "http://bianca-teleman-crud-server.herokuapp.com/"];
 const corsOptions = {
  origin: function(origin, callback) {
  if (!origin)
