@@ -6,6 +6,8 @@ import { inherits } from "util";
 //import HEADERS from "./headers.json";
 import * as mongodb from "mongodb";
 import cors from "cors";
+import fileUpload, {UploadedFile} from "express-fileupload"
+import ENVIRONMENT from "environment.json";
 
 const mongoClient = mongodb.MongoClient;
 const CONNECTION_STRING=process.env.MONGODB_URI
@@ -41,7 +43,12 @@ const corsOptions = {
  },
  credentials: true
 };
-//app.use("/", cors(corsOptions));
+app.use("/", cors(corsOptions) as any);
+
+//6. fileupload
+app.use(fileUpload({
+  "limits":{"fileSize":(10*1024*1024)} //10 MB
+}))
 
 
 let paginaErrore="";
@@ -125,7 +132,7 @@ app.use("/", (req, res, next) => {
   // listener specifici
   app.get("/api/images", (req, res, next) => {
     let db = req["client"].db(DB_NAME) as mongodb.Db;
-    let collection = db.collection(currentCollection);
+    let collection = db.collection("images");
     let request = collection.insertOne(req["body"]);
     request.then((data) => {
       res.send(data);
@@ -137,22 +144,36 @@ app.use("/", (req, res, next) => {
       req["client"].close();
     });
 
-    app.post("/api/*", (req, res, next) => {
+    app.post('/api/uploadBinary', function (req, res, next) {
+      let db=req["client"].db(DB_NAME) as mongodb.Db;
+      if (!req.files || Object.keys(req.files).length == 0|| !req.body.username)
+        res.status(400).send('No files were uploaded');
+      else{
+        let _file = req.files.img as UploadedFile;
+        _file.mv('./static/img/' + _file["name"], function(err) {
+     if (err)
+        res.status(500).json(err.message);
+     else
       let db = req["client"].db(DB_NAME) as mongodb.Db;
-      let collection = db.collection(currentCollection);
-      let request = collection.insertOne(req["body"]);
-      request.then((data) => {
-        res.send(data);
-        });
-        request.catch((err) => {
-        res.status(503).send("Sintax error in the query");
-        });
-        request.finally(() => {
-        req["client"].close();
-      });
+     let collection = db.collection("images");
+     let user={"username":req.body.username,
+                "img":_file.name}
+     let request = collection.insertOne(req["body"]);
+     request.then((data) => {
+       res.send(data);
+       });
+       request.catch((err) => {
+       res.status(503).send("Sintax error in the query");
+       });
+       request.finally(() => {
+       req["client"].close();
+      })
+      }
+     );
+     
   
 
-});
+}});
   
 
 //****************************************************************
@@ -164,3 +185,4 @@ app.use("/", function(err, req, res, next){
 
 
 
+  })

@@ -32,7 +32,7 @@ $(document).ready(function() {
 		return;
 	}
 	
-	let form = $("form").get(0)
+	// form = $("form").get(0)
 	let formData = new FormData();		
 	formData.append('username', username);		
 	formData.append('img', file);		
