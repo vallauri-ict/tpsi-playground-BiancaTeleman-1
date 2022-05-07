@@ -1,0 +1,23 @@
+[
+    {
+        "_id":1,
+        "descrizione":"è una bella casa",
+        "data":"22/10/2020",
+        "lat":44.6086383,
+        "long":9.959571,
+        "id_oper":1,
+	"citta":"Montaldo",
+        "foto":[]
+    },
+	{
+        "_id":2,
+        "descrizione":"è una casa",
+        "data":"25/10/2020",
+        "lat":46.889664,
+        "long": 27.360388,
+        "id_oper":2,
+	"citta":"Alba",
+        "foto":[]
+    }
+
+]

@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>JWT</title>
+    <link rel="icon" href="img/icoVallauri.png" type="image/png" />
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=">	</script>
+      <link rel="stylesheet" href="index.css"> 
+      <script type="text/javascript" src="libreria.js"></script>
+      <script type="text/javascript" src="index.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Titolo -->
+        <div class="row align-items-center">
+            <div class="col-sm-2"> </div>
+            <div class="col-sm-8 text-center" style="padding:15px;">
+                <img src="img/vallauri.jpg" class="img-fluid">
+            </div>
+            <div class="col-sm-2">
+                <button type="button" class="btn btn-secondary" style="margin-top:16px" id="btnLogout">Logout</button>
+                <button type="button" class="btn btn-secondary" style="margin-top:16px" id="btnCreaUtente">Crea Utente</button>
+            </div>
+        </div>
+
+        <!--send mail-->
+        
+        <button type="button" class="btn btn-secondary" id="btnMostra" align="center" style="margin: auto;">Mostra tabella e mappa</button>
+        <div id="divFiltra">
+            <input type="text" id="txtFiltra" placeholder="Inserisci utente">
+            <button type="button" class="btn btn-secondary" id="btnFiltra">Filtra</button>
+        </div>
+        
+        <br>
+
+        <!-- elenco mail-->
+        <div id="divMap">
+            <table class="table table-hover" id="tabMail">
+                <thead>
+                    <tr>
+                        <th width="16.5%">Città</th>
+                        <th width="16.5%">Data</th>
+                        <th width="67%">Descrizione</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody">
+                    
+                </tbody>
+            </table>
+            <div id="wrapper">
+            </div>   
+            <div class="msg" id="msg">   </div>
+        </div>
+        <div id="divDesc">
+            <label id="lblId">ID:</label> 
+            <br>
+            <label>Descrizione:</label> <input type="text" id="txtModDesc"> <button type="button" class="btn btn-secondary" id="btnModificaDesc">Modifica</button>
+            <br>
+            <label id="lblData">Data: </label>
+            <br>
+            <label id="lblCoord">Coordinate:</label>
+            <br>
+            <label id="lblOper">Operatore:</label>
+            <br>
+            <label id="lblCitta">Citta:</label>
+            <br>
+            <div id="divImg"></div><br>
+
+            <button type="button" class="btn btn-secondary" id="btnChiudiDesc">Chiudi</button>
+        </div>
+    </div>
+
+    <!-- end container -->
+    <div id="divCreaUtente">
+        <label>Inserisci email:</label>
+        <input type="text" id="txtCreaMailU">
+        <br>
+        <label>Inserisci username:</label>
+        <input type="text" id="txtCreaUserU">
+        <br>
+        <button type="button" class="btn btn-secondary" style="margin-top:16px" id="btnCreaUtenteNew">Crea</button>
+        <button type="button" class="btn btn-secondary" style="margin-top:16px" id="btnCreaUtenteIndietro">Indietro</button>
+
+    </div>
+</body>
+
+	
+</html>

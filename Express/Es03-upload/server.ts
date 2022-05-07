@@ -7,10 +7,19 @@ import { inherits } from "util";
 import * as mongodb from "mongodb";
 import cors from "cors";
 import fileUpload, {UploadedFile} from "express-fileupload"
-import ENVIRONMENT from "environment.json";
+import ENVIRONMENT from "./environment.json";
+import cloudinary from "cloudinary";
+
+cloudinary.v2.config({
+  cloud_name:ENVIRONMENT["CLOUD-NAME"],
+  api_key:ENVIRONMENT.CLOUDINARY.API_KEY,
+  api_secret:ENVIRONMENT.CLOUDINARY.API_SECRET,
+  
+})
+
 
 const mongoClient = mongodb.MongoClient;
-const CONNECTION_STRING=process.env.MONGODB_URI
+const CONNECTION_STRING=process.env.MONGODB_URI || "mongodb+srv://Bianca:bianca03@cluster0.sxrct.mongodb.net/5B?retryWrites=true&w=majority"
 /*const CONNECTION_STRING =
   "mongodb+srv://Bianca:bianca03@cluster0.sxrct.mongodb.net/5B?retryWrites=true&w=majority";*/
 const DB_NAME = "recipeBook";
@@ -154,8 +163,7 @@ app.use("/", (req, res, next) => {
      if (err)
         res.status(500).json(err.message);
      else
-      let db = req["client"].db(DB_NAME) as mongodb.Db;
-     let collection = db.collection("images");
+         collection = db.collection("images");
      let user={"username":req.body.username,
                 "img":_file.name}
      let request = collection.insertOne(req["body"]);
@@ -170,8 +178,21 @@ app.use("/", (req, res, next) => {
       })
       }
      );
-     
-  
+
+     app.post("/api/cloudinary", (req, res, next) => {
+      let db = req["client"].db(DB_NAME) as mongodb.Db;
+      let collection = db.collection("images");
+      let request = collection.insertOne(req["body"]);
+      request.then((data) => {
+        res.send(data);
+        });
+        request.catch((err) => {
+        res.status(503).send("Sintax error in the query");
+        });
+        request.finally(() => {
+        req["client"].close();
+      });
+    })
 
 }});
   

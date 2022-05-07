@@ -1,0 +1,9 @@
+{
+    "CLOUDINARY":{
+        "CLOUD-NAME":  "bianca-teleman" ,
+        "API_KEY": "885333248364222" ,
+        "API_SECRET":   "yCx5fpCnGWGIYVogckC5k1NgDCY",
+        "CLOUDINARY_URL": "CLOUDINARY_URL=cloudinary://885333248364222:yCx5fpCnGWGIYVogckC5k1NgDCY@bianca-teleman"
+    },
+    "CONNECTION_STRING":"mongodb+srv://Bianca:bianca03@cluster0.sxrct.mongodb.net/5B?retryWrites=true&w=majority"
+}
