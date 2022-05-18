@@ -1,4 +1,6 @@
-
+/*body{
+	background-color: lightslategray;
+}*/
 .container{
 	padding-top:15px;
 }
@@ -8,6 +10,10 @@
 	background-color:#F2F2FF; 
 	padding:12px;	
 	margin:12px 0;
+}
+#tabMail{
+	width:65%;
+	margin:auto;
 }
 
 #frmInvia input{
@@ -31,10 +37,13 @@
 	background-color:#F2F2FF; 
 	margin-top:20px;
 	margin-bottom:0;
+	/*width:60%;
+	margin:0 auto;*/
 }
 
 #wrapper{
 	width:800px;
+	width:75%;
 	height:600px;
 	margin:10px auto;		
 }
@@ -52,6 +61,7 @@
 .imgDesc{
 	width:100px;
 	height:100px;
+	/*margin-bottom:2px;*/
 }
 
 #wrapper #panel{
@@ -60,8 +70,20 @@
 	float:right;			
 }
 #wrapper #msg{
-	width:800px;
+	/*width:800px;*/
+	width:75%;
 	margin:10px;
 	font-size:16pt;			
 	display:inline-block;
+	text-align: center;
+
 }	
+#divDesc{
+	text-align: center;
+	width:800px;
+	width:65%;
+	margin:auto;
+}
+#container2{
+	text-align: center;
+}

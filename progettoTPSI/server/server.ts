@@ -18,9 +18,10 @@ import * as nodemailer from "nodemailer";
 
 // ***************************** Costanti *************************************
 const app = express();
-const CONNECTION_STRING = environment.CONNECTION_STRING_ATLAS
+//const CONNECTION_STRING = environment.CONNECTION_STRING_ATLAS
 const DBNAME = "progetto"
 const DURATA_TOKEN = 45464156313 // sec
+let port : number = parseInt(process.env.PORT) || 1337
 const HTTP_PORT = 1337
 //const HTTPS_PORT = 1338
 const privateKey = fs.readFileSync("keys/privateKey.pem", "utf8");
@@ -36,10 +37,11 @@ cloudinary.v2.config({
 
 // ***************************** Avvio ****************************************
 const httpServer = http.createServer(/*credentials,*/ app);
-httpServer.listen(HTTP_PORT, function() {
-    console.log("Server HTTP in ascolto sulla porta " + HTTP_PORT);
+httpServer.listen(port, function() {
+    console.log("Server HTTP in ascolto sulla porta " + port);
     init();
 });
+const CONNECTION_STRING = process.env.MONGODB_URI || environment.CONNECTION_STRING_ATLAS
 let paginaErrore = "";
 function init() {
     fs.readFile("./static/error.html", function(err, data) {
@@ -85,7 +87,9 @@ const corsOptions = {
     origin: function(origin, callback) {
           return callback(null, true);
     },
-    credentials: true
+    credentials: true,
+    allowedHeaders:['Content-Type','authorization'],
+    exposedHeaders:["authorization"]
 };
 app.use("/", cors(corsOptions));
 
@@ -99,6 +103,52 @@ app.use("/", fileUpload({
 /* ***************** (Sezione 2) middleware relativi a JWT ****************** */
 // gestione login
 app.post("/api/login",function(req,res,next){
+    MongoClient.connect(CONNECTION_STRING, function(err,client){
+        if(err){
+            res.status(501).send("Errore connessione al DB")["log"](err);
+        }
+        else{
+            const db = client.db(DBNAME);
+            const collection = db.collection("admin");
+            let username = req.body.username;
+            console.log(username)
+            // controllo key unsensitive
+            let regex = new RegExp("^" + username + "$","i");
+            collection.findOne({"username":regex},function(err,dbUser){
+                console.log(dbUser)
+                if(err){
+                    res.status(500).send("Errore esecuzione query");
+                }
+                else{
+                    if(!dbUser){
+                        res.status(401).send("Username non valido");
+                    }
+                    else{
+                        if(req.body.password){
+                            if(bcrypt.compareSync(req.body.password,dbUser.password))
+                            {
+                                let token = creaToken(dbUser);
+                                // salvo il token nell'header
+                                res.setHeader("authorization",token);
+                                res.send({"ris":dbUser._id});
+                            }
+                            else
+                            {
+                                res.status(401).send("Password non valida");
+                            }
+                        }
+                        else
+                        {
+                            res.status(401).send("Username non valido");
+                        }
+                    }
+                }
+            });
+        }
+    })
+});
+
+app.post("/api/loginOperatori",function(req,res,next){
     MongoClient.connect(CONNECTION_STRING, function(err,client){
         if(err){
             res.status(501).send("Errore connessione al DB")["log"](err);
@@ -121,12 +171,12 @@ app.post("/api/login",function(req,res,next){
                     }
                     else{
                         if(req.body.password){
-                            if(bcrypt.compare(req.body.password,dbUser.password))
+                            if(bcrypt.compareSync(req.body.password,dbUser.password))
                             {
                                 let token = creaToken(dbUser);
                                 // salvo il token nell'header
                                 res.setHeader("authorization",token);
-                                res.send({"ris":"ok"});
+                                res.send({"ris":dbUser._id});
                             }
                             else
                             {
@@ -182,56 +232,6 @@ function creaToken(dbUser){
 
 /* ********************** (Sezione 3) USER ROUTES  ************************** */
 // gestione elenco delle mail utente
-app.get("/api/elencoMail",function(req,res,next){
-    MongoClient.connect(CONNECTION_STRING,function(err,client){
-        if(err){
-            res.status(503).send("Errore connessione al DB");
-        }
-        else{
-            const db = client.db(DBNAME);
-            const collection = db.collection("utente");
-            const id = req["payload"]._id;
-            var oid = new ObjectId(id);
-            let request = collection.findOne({"_id":oid});
-            request.then(function(data){
-                res.send(data.mail.reverse());
-            });
-            request.catch(function(){
-                res.status(500).send("Errore esecuzione query");
-            })
-            request.finally(function(){
-                client.close();
-            })
-        }
-    });
-});
-
-// gestione di una nuova mail
-app.post("/api/newMail",function(req,res,next){
-    MongoClient.connect(CONNECTION_STRING,function(err,client){
-        if(err){
-            res.status(503).send("Errore connessione al DB");
-        }
-        else{
-            const db = client.db(DBNAME);
-            const collection = db.collection("mail");
-            
-            let mittente = req["payload"].username;
-            let mail = {"from":mittente,"subject":req.body.subject,"body":req.body.message};
-
-            let request = collection.updateOne({"username":req.body.to},{$push:{"mail":mail}});
-            request.then(function(data){
-                res.send("Mail inviata correttamente");
-            });
-            request.catch(function(){
-                res.status(500).send("Errore esecuzione query");
-            })
-            request.finally(function(){
-                client.close();
-            })
-        }
-    });
-});
 
 let transporter = nodemailer.createTransport({"service":"gmail",
                                             "auth":environment.MAILCREDENTIALS});
@@ -247,8 +247,9 @@ app.post("/api/creaUtente",function(req,res,next)
             let email=req.body.email;
             let username=req.body.username;
             //let password=req.body.password;
+            console.log(email+" - "+username)
             let password=generaPassword(10);
-            let newUser={"email":email,"username":username,"password":password}
+            let newUser={"email":email,"username":username,"password":bcrypt.hashSync(password)}
             
             let mailOptions = {"from":environment.MAILCREDENTIALS.user,"to":email,"subject":"Rilievi e perizie",
             "html":"<p>La password per accedere è la seguente:"+password+"</p>"};
@@ -289,23 +290,6 @@ app.get("/api/location",function(req,res,next){
         else{
             const db = client.db(DBNAME);
             const collection = db.collection("perizie");
-            /*let id_oper=req.body.id_oper;
-            let oid = new ObjectId(id_oper);
-            if(id_oper!=undefined || id_oper!=null)
-            {
-                let request = collection.find({"id_oper":oid}).toArray();
-                request.then(function(data){
-                    res.send(data);
-                });
-                request.catch(function(){
-                    res.status(500).send("Errore esecuzione query");
-                })
-                request.finally(function(){
-                    client.close();
-                })
-            }
-            else
-            {*/
                 let request = collection.find().toArray();
                 request.then(function(data){
                     res.send(data);
@@ -316,8 +300,6 @@ app.get("/api/location",function(req,res,next){
                 request.finally(function(){
                     client.close();
                 })
-            //}
-            
         }
     });
 });
@@ -330,11 +312,7 @@ app.post("/api/modifica",function(req,res,next){
         else{
             const db = client.db(DBNAME);
             const collection = db.collection("perizie");
-            //const id = req["payload"]._id;
             let id=req.body._id
-            /*let id1=req.body._id;
-            let id2=id1.toString();*/
-            
             let oid = new ObjectId(id);
             let campo=req.body.campo;
             let testo=req.body.testo;
@@ -370,7 +348,7 @@ app.post("/api/modifica",function(req,res,next){
     });
 });
 
-app.get("/api/filtra",function(req,res,next){
+app.get("/api/filtra/:_id",function(req,res,next){
     MongoClient.connect(CONNECTION_STRING,function(err,client){
         if(err){
             res.status(503).send("Errore connessione al DB");
@@ -378,11 +356,11 @@ app.get("/api/filtra",function(req,res,next){
         else{
             const db = client.db(DBNAME);
             const collection = db.collection("perizie");
-            let id_oper=req.body.id_oper;
+            let id_oper=req.params._id;
             let oid = new ObjectId(id_oper);
             let request = collection.find({"id_oper":oid}).toArray();
             request.then(function(data){
-                res.send(data);
+                res.send({"ris":data});
             });
             request.catch(function(){
                 res.status(500).send("Errore esecuzione query");
@@ -406,10 +384,9 @@ app.post("/api/checkUser",function(req,res,next){
             const collection = db.collection("utente");
             let username=req.body.username;
             let request = collection.find({"username":username}).toArray();
-            console.log(username)
             request.then(function(data){
                 console.log(data)
-                    res.send(data);
+                    res.send({"ris":data});
             });
             request.catch(function(){
                 res.status(500).send("Errore esecuzione query");
@@ -430,6 +407,62 @@ function generaPassword(n)
     }
     return ris;
 }
+
+app.post("/api/uploadCampi",function(req,res,next)
+{
+    MongoClient.connect(CONNECTION_STRING,function(err,client){
+        if(err){
+            res.status(503).send("Errore connessione al DB");
+        }
+        else{
+            const db = client.db(DBNAME);
+            const collection = db.collection("perizie");
+            /*let id_oper=req.body.id_oper;
+            let descrizione=req.body.descrizione;
+            let data=req.body.data;
+            let lat=req.body.lat;
+            let long=req.body.long;
+            let citta=req.body.citta;
+
+            
+            let newPerizia={
+                "id_oper":id_oper,
+                "descrizione":descrizione,
+                "data":data,
+                "lat":lat,
+                "long":long,
+                "citta":citta
+            }*/
+            let newPerizia=req.body;
+            let id=req.body.id_oper
+            let oid = new ObjectId(id);
+            newPerizia.id_oper=oid;
+            console.log(newPerizia)
+            let request = collection.insertOne(newPerizia)
+            request.then(function(data){
+               
+                res.send(data);
+            });
+            request.catch(function(){
+                res.status(500).send("Errore esecuzione query");
+            })
+            request.finally(function(){
+                client.close();
+            })
+            
+        }
+    })
+})
+
+app.post("/api/cloudinaryBase64", function (req, res, next) {
+    cloudinary.v2.uploader.upload(req.body.image, { "folder": "progetto" })
+        .catch((error) => {
+            res.status(500).send("Errore nel caricamento del file su cloudinary");
+        })
+        .then((result: UploadApiResponse) => {
+            res.send({"url":result.secure_url}) 
+        })
+})
 /* ***************** (Sezione 4) DEFAULT ROUTE and ERRORS ******************* */
 // gestione degli errori
 app.use(function(err, req, res, next) {

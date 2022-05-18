@@ -9,7 +9,7 @@ function inviaRichiesta(method, url, parameters = {}) {
     }
 
     return $.ajax({
-        url: url, //default: currentPage
+        url: "https://bianca-teleman-progetto.herokuapp.com"+url, //default: currentPage
         type: method,
         data: parameters,
         contentType: contentType,

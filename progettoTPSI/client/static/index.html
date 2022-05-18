@@ -20,6 +20,7 @@
 <body>
     <div class="container">
         <!-- Titolo -->
+        
         <div class="row align-items-center">
             <div class="col-sm-2"> </div>
             <div class="col-sm-8 text-center" style="padding:15px;">
@@ -32,13 +33,17 @@
         </div>
 
         <!--send mail-->
+        <div id="container">
+        <div id="container2">
+
         
         <button type="button" class="btn btn-secondary" id="btnMostra" align="center" style="margin: auto;">Mostra tabella e mappa</button>
         <div id="divFiltra">
-            <input type="text" id="txtFiltra" placeholder="Inserisci utente">
-            <button type="button" class="btn btn-secondary" id="btnFiltra">Filtra</button>
+            <input type="text" id="txtFiltra" placeholder="Inserisci utente" style="margin-top:2px;margin-bottom: 3px;">
+            <br>
+            <button type="button" class="btn btn-secondary" id="btnFiltra" >Filtra</button>
         </div>
-        
+    </div>
         <br>
 
         <!-- elenco mail-->
@@ -46,9 +51,9 @@
             <table class="table table-hover" id="tabMail">
                 <thead>
                     <tr>
-                        <th width="16.5%">Città</th>
-                        <th width="16.5%">Data</th>
-                        <th width="67%">Descrizione</th>
+                        <th width="16.5%" >Città</th>
+                        <th width="20.5%" >Data</th>
+                        <th width="63%" >Descrizione</th>
                     </tr>
                 </thead>
                 <tbody id="tbody">
@@ -77,18 +82,23 @@
             <button type="button" class="btn btn-secondary" id="btnChiudiDesc">Chiudi</button>
         </div>
     </div>
+</div>
 
     <!-- end container -->
-    <div id="divCreaUtente">
-        <label>Inserisci email:</label>
-        <input type="text" id="txtCreaMailU">
-        <br>
-        <label>Inserisci username:</label>
-        <input type="text" id="txtCreaUserU">
+    <div id="divCreaUtente" style="text-align: center;">
+        <div>
+            <label>Inserisci email:</label>
+            <input type="text" id="txtCreaMailU"></div>
+        
+        <div>
+            <label>Inserisci username:</label>
+            <input type="text" id="txtCreaUserU">
+        </div>
+        
         <br>
         <button type="button" class="btn btn-secondary" style="margin-top:16px" id="btnCreaUtenteNew">Crea</button>
         <button type="button" class="btn btn-secondary" style="margin-top:16px" id="btnCreaUtenteIndietro">Indietro</button>
-
+        
     </div>
 </body>
 

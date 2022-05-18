@@ -49,6 +49,7 @@ $(document).ready(function() {
 			});
 			request.done(function(data,test_status,jqXHR) {	
 				//alert(jqXHR.getResponseHeader('authorization'));
+				localStorage.setItem("token",jqXHR.getResponseHeader('authorization') )
 				window.location.href = "index.html";
 			})			
 		}

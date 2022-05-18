@@ -10,7 +10,8 @@ $(document).ready(function() {
     let tbody=$("#tbody");
     let btnFiltra=$("#btnFiltra");
     let divFiltra=$("#divFiltra");
-    let txtFiltra=$("#txtFiltra").val();
+    let txtFiltra=$("#txtFiltra");
+    let k=0;
     
     let marcatore2;
     let linkVallauri="https://res.cloudinary.com/bianca-teleman/image/upload/v1651773452/progetto/vallauriEdificio_jts3cp.jpg"
@@ -29,6 +30,7 @@ $(document).ready(function() {
     let mappa;
     let panel= $("#panel")
     let msg =  $("#msg") 
+    let containerId=$("#container")
 
     divCreaUtente.hide();
     table.hide();
@@ -37,7 +39,7 @@ $(document).ready(function() {
     let idOper=null;
     _btnCreaUtente.on("click",function()
     {
-        $(".container").hide();
+        $("#container").hide();
         divCreaUtente.show();
         
     })
@@ -45,32 +47,14 @@ $(document).ready(function() {
     btnCreaUtenteNew.on("click",function()
     {
         
-        let newUserMail=$("#txtCreaMailU").val();
-        let newUserUser=$("#txtCreaUserU").val();
-        if(checkUser(newUserUser))
-        {
-            let request=inviaRichiesta("POST",'/api/creaUtente',
-            {
-                "email":newUserMail,
-                "username":newUserUser
-            })
-            request.done(function(data)
-            {
-                console.log(data);
-            })
-            request.fail(errore);
-        }
-        else
-        {
-            alert("utente già esistente")
-        }
+        checkUser();
         
     })
 
     $("#btnCreaUtenteIndietro").on("click",function(data)
     {
         divCreaUtente.hide();
-        $(".container").show();
+        $("#container").show();
         $("#txtCreaMailU").val("");
         $("#txtCreaUserU").val("");
 
@@ -85,9 +69,6 @@ $(document).ready(function() {
         request.done(function(data)
         {
             console.log(data[0]);
-
-            
-
             let wrapper = $("#wrapper")[0]
             // vallauri
             let position = new google.maps.LatLng(44.5557763, 7.7347183);	
@@ -128,9 +109,8 @@ $(document).ready(function() {
                     "zIndex" : 3,
                 });
                 marcatore2.addListener("click",function(){
-                    console.log("CIAOOOO");
                     divDesc.show();
-                    
+                    divImg.empty()
                     lblId.text("ID: "+data[i]._id);
                     txtModDesc.val(data[i].descrizione);
                     lblData.text("Data: "+data[i].data);
@@ -142,28 +122,32 @@ $(document).ready(function() {
                     visualizzaPercorso(position,position2)
                     btnModificaDesc.on("click",modifica);
                     
+                    
                     for (const item of data[i].foto) 
                     {
                         let divInterno=$("<div>").appendTo(divImg);
                         let img=$("<img>").appendTo(divInterno);
+                        divInterno.css({"display":"inline-block","margin-right":"5px"})
                         img.prop("src",item.link);
                         img.addClass("imgDesc");
 
                         let br=$("<br>").appendTo(divInterno);
                         //br=$("<br>").appendTo(divInterno);
-                        txtDescImg=$("<input type='text'>").appendTo(divInterno);
+                        txtDescImg=$(`<input type='text' id='txt${k}'>`).appendTo(divInterno);
+                        txtDescImg.css({"margin-bottom":"2px"})
                         txtDescImg.val(item.commento)
                         txtDescImg.prop("dett",data[i]);
                         br=$("<br>").appendTo(divInterno);
                         let btn=$("<button type='button' class='btn btn-secondary' style='height:30px' style='text-align:center'>").appendTo(divInterno);
                         btn.text("Modifica");
+                        btn.prop("index",k)
                         btn.prop("_id",data[i]._id);
                         btn.prop("campo","commento");
                         //btn.prop("testo",txtDescImg.val());
                         btn.on("click",modifica);
                         btn.prop("imgL",item.link)
                         //btn.css({"text-align":"center","margin:auto"})
-
+                        k++;
 
                     }
                     
@@ -180,15 +164,106 @@ $(document).ready(function() {
     
     btnFiltra.on("click",function()
     {
-        let rq=inviaRichiesta("POST","/api/checkUser",{"username":txtFiltra})
+        let rq=inviaRichiesta("POST","/api/checkUser",{"username":txtFiltra.val()})
         rq.done(function(data)
         {
-            idOper=data[0]._id
-            let request=inviaRichiesta("POST","/api/filtra",{"id_oper":idOper});
+            
+            idOper=data.ris[0]._id
+            console.log(idOper)
+            let request=inviaRichiesta("GET","/api/filtra/"+idOper,);
             {
                 request.done(function(data)
                 {
-                    
+                    tbody.empty();
+                    table.show();
+                    divFiltra.show();
+                    console.log(data)
+                    let wrapper = $("#wrapper")[0]
+                    // vallauri
+                    let position = new google.maps.LatLng(44.5557763, 7.7347183);	
+                    console.log(position)
+                    console.log(wrapper)
+                    let mapOptions = {
+                        "center":position,
+                        "zoom":5, 
+                        "mapTypeId": google.maps.MapTypeId.ROADMAP,	
+                    }
+                    mappa = new google.maps.Map(wrapper, mapOptions); 
+
+                    // Creazione di un Marcatore
+                    let marcatore1 = new google.maps.Marker({
+                        "map" : mappa,
+                        "position" : position,
+                        "animation" : google.maps.Animation.DROP,
+                        "zIndex" : 3,
+                    });
+
+                    for(let i=0;i<data.ris.length;i++)
+                    {
+                        let tr=$("<tr>").appendTo(tbody);
+                        let td=$("<td>").appendTo(tr);
+                        td.text(data.ris[i].citta);
+
+                        td=$("<td>").appendTo(tr);
+                        td.text(data.ris[i].data);
+
+                        td=$("<td>").appendTo(tr);
+                        td.text(data.ris[i].descrizione);
+
+                        let position2=new google.maps.LatLng(data.ris[i].lat, data.ris[i].long);
+                        marcatore2 = new google.maps.Marker({
+                            "map" : mappa,
+                            "position" : position2,
+                            "animation" : google.maps.Animation.DROP,
+                            "zIndex" : 3,
+                        });
+                        marcatore2.addListener("click",function(){
+                            divDesc.show();
+                            divImg.empty()
+                            lblId.text("ID: "+data.ris[i]._id);
+                            txtModDesc.val(data.ris[i].descrizione);
+                            lblData.text("Data: "+data.ris[i].data);
+                            lblCoord.text("Coordinate: "+data.ris[i].lat+","+data.ris[i].long);
+                            lblOper.text("ID operatore: "+data.ris[i].id_oper);
+                            lblCitta.text("Città: "+data.ris[i].citta);
+                            btnModificaDesc.prop("_id",data.ris[i]._id);
+                            btnModificaDesc.prop("campo","descrizione");
+                            visualizzaPercorso(position,position2)
+                            btnModificaDesc.on("click",modifica);
+                            
+                            
+                            for (const item of data.ris[i].foto) 
+                            {
+                                let divInterno=$("<div>").appendTo(divImg);
+                                divInterno.css({"display":"inline-block","margin-right":"5px"})
+                                let img=$("<img>").appendTo(divInterno);
+                                img.prop("src",item.link);
+                                img.addClass("imgDesc");
+
+                                let br=$("<br>").appendTo(divInterno);
+
+                                //br=$("<br>").appendTo(divInterno);
+                                txtDescImg=$(`<input type='text' id='txt${k}'>`).appendTo(divInterno);
+                                txtDescImg.css({"margin-bottom":"2px"})
+                                //txtDescImg.prop("id","txt"+k)
+                                txtDescImg.val(item.commento)
+                                txtDescImg.prop("dett",data.ris[i]);
+                                br=$("<br>").appendTo(divInterno);
+                                let btn=$("<button type='button' class='btn btn-secondary' style='height:30px' style='text-align:center'>").appendTo(divInterno);
+                                btn.text("Modifica");
+                                btn.prop("_id",data.ris[i]._id);
+                                btn.prop("campo","commento");
+                                btn.prop("index",k)
+                                //btn.prop("testo",txtDescImg.val());
+                                btn.on("click",modifica);
+                                btn.prop("imgL",item.link)
+                                //btn.css({"text-align":"center","margin:auto"})
+                                k++;
+
+                            }
+                            
+                        })
+                    }
                 })
             }
         })
@@ -206,7 +281,7 @@ $(document).ready(function() {
         }
         else
         {
-            testo=txtDescImg.val();
+            testo=$("#txt"+($(this).prop("index"))).val();
             linkMod=$(this).prop("imgL");
         }
         
@@ -235,23 +310,36 @@ $(document).ready(function() {
     });
     
     let exist
-    function checkUser(user)
+    function checkUser()
     {
-        let request=inviaRichiesta("POST","/api/checkUser",{"username":user});
+        let newUserMail=$("#txtCreaMailU").val();
+        let newUserUser=$("#txtCreaUserU").val();
+        let request=inviaRichiesta("POST","/api/checkUser",{"username":newUserUser});
         request.done(function(data)
         {
-            if(data.length==0)
+            console.log(data)
+            if(data.ris.length==0)
             {
-                exist=false;
-            }
+                let rq=inviaRichiesta("POST",'/api/creaUtente',
+                {
+                    "email":newUserMail,
+                    "username":newUserUser
+                })
+                rq.done(function(data)
+                {
+                    console.log(data);
+                })
+                rq.fail(errore);
+                }
             else
             {
-                exist=true;
+                alert("utente già esistente")
+                
             }
             
         })
         request.fail(errore);
-        return exist
+        //return exist;
     }
 
     function visualizzaPercorso(start,arrive)

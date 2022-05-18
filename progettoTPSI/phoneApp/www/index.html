@@ -1,50 +1,124 @@
-<!DOCTYPE html>
-<!--
-    Licensed to the Apache Software Foundation (ASF) under one
-    or more contributor license agreements.  See the NOTICE file
-    distributed with this work for additional information
-    regarding copyright ownership.  The ASF licenses this file
-    to you under the Apache License, Version 2.0 (the
-    "License"); you may not use this file except in compliance
-    with the License.  You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing,
-    software distributed under the License is distributed on an
-    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-     KIND, either express or implied.  See the License for the
-    specific language governing permissions and limitations
-    under the License.
--->
+<!doctype html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <!--
-        Customize this policy to fit your own app's needs. For more guidance, please refer to the docs:
-            https://cordova.apache.org/docs/en/latest/
-        Some notes:
-            * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
-            * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
-                * Enable inline JS: add 'unsafe-inline' to default-src
-        -->
-        <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;">
+ <head>
+	<title>Camera</title>
+    <meta charset="UTF-8">
+    <!-- Cordova Meta Tags -->    
+        <meta http-equiv="Content-Security-Policy"  
+	          content="default-src *;  script-src * 'unsafe-inline';  style-src * 'unsafe-inline';  img-src *  data:  content:; ">
         <meta name="format-detection" content="telephone=no">
         <meta name="msapplication-tap-highlight" content="no">
         <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
-        <meta name="color-scheme" content="light dark">
-        <link rel="stylesheet" href="css/index.css">
-        <title>Hello World</title>
-    </head>
-    <body>
-        <div class="app">
-            <h1>Apache Cordova</h1>
-            <div id="deviceready" class="blink">
-                <p class="event listening">Connecting to Device</p>
-                <p class="event received">Device is Ready</p>
-            </div>
-        </div>
-        <script src="cordova.js"></script>
-        <script src="js/index.js"></script>
-    </body>
+        <meta name="color-scheme" content="light dark">	
+	<!-- -->
+	
+	<link rel="icon" href="img/icoVallauri.png" type="image/png" />
+	
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+	<link  rel="stylesheet"  href="css/index.css" />
+	<script type="text/javascript" src="js/libreria.js"></script>	
+    <script src="cordova.js"> </script>
+	<script src="js/index.js"> </script>
+ </head>
+ 
+ 
+ <body>
+	 <div id="divLogin">
+		<div class="row">
+			<div class="col-md-3 col-sm-2"></div>
+			<div class="col-md-6 col-sm-8"> 
+				<div class="jumbotron text-center" data-toggle="collapse" 
+												   data-target="#login">
+					<img src="img/logoNew.jpg" width="120" class="rounded-circle"> 
+					<h4 class="titolo">Rilievi e Perizie</h4>
+				</div>
+			</div>
+			<div class="col-md-6 col-sm-2"></div>
+		</div>
+	
+		<!-- LOGIN FORM -->	
+		<div class="row collapse" id="login">   
+			<div class="col-md-3 col-sm-2"></div>
+			<div class="col-md-6 col-sm-8">			
+				<form id="frmLogin">
+					<div class="form-group input-group">
+						<span class="input-group-text">
+							<i class="fas fa-user"> </i>
+						</span>
+						<input type="text" class="form-control" id="usr" 
+							   placeholder="Username">
+					</div>
+					
+					<!-- password -->
+					<div class="form-group input-group">
+						<span class="input-group-text">
+							<i class="fas fa-lock"> </i>
+						</span>
+						<input type="password" class="form-control" id="pwd"
+								  placeholder="Password">
+					</div>
+	
+					
+					<!-- messaggio di errore -->
+					<div class="alert alert-danger alert-dismissible" id="lblErrore">	
+						   
+						<button type="button" class="close" >&times;</button>
+						<strong>Attenzione!</strong> Username o Password non validi
+					</div>
+	
+									
+				  <!-- pulsanti -->
+				  <div class="form-group">
+					  <button type="button" class="btn btn-secondary btn-block" 
+							  id="btnLogin">	LOGIN
+					  </button>									
+				  </div>					
+				</form>
+			</div>	
+			<!-- fine col-sm-4 -->
+			<div class="col-md-3 col-sm-3"></div>
+		</div>
+	 </div>
+	 <div id="divPerizie" >
+		<img src="img/logo.png" width="120" class="rounded-circle" id="imgVallauri">
+		<br>
+		<br>
+		<button type="button" class="btn btn-secondary" id="btnNuovaPerizia" style="margin:0 auto">Nuova Perizia</button>
+	 </div>
+	<div id="divCrea">
+		<img src="img/logo.png" width="120" class="rounded-circle" id="imgVallauri">
+		<br>
+		<br>
+		<label style="margin:auto;">Data:</label><br><input type="date" id="calendario">
+		<br>
+		<label style="margin:auto;">Latitudine:</label> <br><input type="text" id="txtLat">
+		<br>
+		<label style="margin:auto;">Longitudine:</label> <br><input type="text" id="txtLong">
+		<br>
+		<label style="margin:auto;">Città:</label><br> <input type="text" id="txtCitta">
+		<br>
+		<textarea id="txtDescBig" placeholder="Inserisci descrizione" style="margin-top: 10px;"></textarea>
+		<br>
+		<br>
+		<div id="divParentAddImg">
+			<div id="addedImg-0">
+				
+			</div>
+			
+		</div>
+		<br>
+		<button type="button" class="btn btn-secondary" id="btnAddPhotoG" style="margin-bottom: 3px;">Aggiungi Foto - galleria</button>
+		<br>
+		<button type="button" class="btn btn-secondary" id="btnAddPhotoS" >Aggiungi Foto - Scatta</button>
+		<br>
+		<br>
+		<label style="color: red;" id="lblErrore2">Parametri mancanti</label>
+		<button type="button" class="btn btn-secondary" id="btnAddPerizia" style="margin:0 auto">Aggiungi Perizia</button>
+		<br>
+	</div>
+ </body>
 </html>
